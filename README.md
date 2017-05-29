@@ -1,2 +1,4 @@
 # identifying-mri-orientation
-colloquially, neural networks on neural networks
+
+
+Identify whether 2D slices of 3D volumes are flipped or not.
