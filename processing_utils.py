@@ -49,7 +49,7 @@ def extract_np_arrays_from_ADNI():
     processed_data = np.zeros(shape = [num_datasets*2*512, 256, 256, 1], dtype = 'uint16')
     processed_labels = np.zeros(shape = [num_datasets*2*512], dtype = 'int32')
     
-    for i in range(2): #(len(proj_dirs)):
+    for i in range(num_datasets): # 2): #(len(proj_dirs)):
         proj_dir = proj_dirs[i]
         filepath = proj_path + proj_dir + '/'
         nii_file = os.listdir(filepath)[0]
@@ -76,7 +76,19 @@ def extract_np_arrays_from_ADNI():
 def process_raw_np(data):
     # slice data, rotate, flip, create labels (flipped/not)
 
-    # append all 2D ~170x256 px slices together (axis=2 is the observation number axis)
+    # Pad with 0s to make 256 x 256 x 256
+
+    # print(data.shape, "DS")
+    
+    w_pad = int((256 - data.shape[0])/2)
+    h_pad = int((256 - data.shape[1])/2)
+    v_pad = int((256 - data.shape[2])/2)
+
+    data = np.pad(data, [(w_pad, w_pad), (h_pad, h_pad), (v_pad, v_pad), (0, 0)], mode='constant')
+    
+    # print(data.shape, "DS pad")
+        
+    # append all 2D 256x256 px slices together (axis=2 is the observation number axis)
     all_slices = np.append(data[:, :, :, 0], np.swapaxes(data[:, :, :, 0], 1, 2), axis = 2)
     n_slice = all_slices.shape[2]
     
@@ -105,11 +117,6 @@ def process_raw_np(data):
 
     # Add final axis to adhere to RGB channel convention
     all_data_random = all_data[:, :, :, np.newaxis]
-    
-    # Pad width with 0s to make 256 x 256 instead of 256 x 170/177/180/etc.
-    #   (could change architecture)
-    w_pad = int((256 - all_data_random.shape[2])/2)
-    all_data_random = np.pad(all_data_random, [(0, 0), (0, 0), (w_pad, w_pad), (0, 0)], mode='constant')
         
     return all_data_random, all_labels_random
 
