@@ -74,20 +74,14 @@ def extract_np_arrays_from_ADNI():
 
 
 def process_raw_np(data):
-    # slice data, rotate, flip, create labels (flipped/not)
-
-    # Pad with 0s to make 256 x 256 x 256
-
-    # print(data.shape, "DS")
+    """pad, slice data, rotate, flip, create labels (flipped/not)"""
     
     w_pad = int((256 - data.shape[0])/2)
     h_pad = int((256 - data.shape[1])/2)
     v_pad = int((256 - data.shape[2])/2)
 
     data = np.pad(data, [(w_pad, w_pad), (h_pad, h_pad), (v_pad, v_pad), (0, 0)], mode='constant')
-    
-    # print(data.shape, "DS pad")
-        
+            
     # append all 2D 256x256 px slices together (axis=2 is the observation number axis)
     all_slices = np.append(data[:, :, :, 0], np.swapaxes(data[:, :, :, 0], 1, 2), axis = 2)
     n_slice = all_slices.shape[2]
